@@ -50,6 +50,39 @@ function autobind(_: any, _2: string, descriptor: PropertyDescriptor) {
   return adjDescriptor;
 }
 
+// ProjectList Class
+class ProjectList {
+  templateElement: HTMLTemplateElement;
+  hostElement: HTMLDivElement;
+  element: HTMLElement;
+
+  constructor(private type: 'active' | 'finished') {
+    this.templateElement = document.getElementById('project-list')! as HTMLTemplateElement;
+    this.hostElement = document.getElementById('app')! as HTMLDivElement;
+  
+    const importedNode = document.importNode(this.templateElement.content, true);
+    this.element = importedNode.firstElementChild as HTMLElement;
+    this.element.id = `${type}-projects`;
+    this.attach();
+    this.renderContent();
+  }
+
+  addProject() {
+
+  }
+
+  private renderContent() {
+    const listId = `${this.type}-projects-list`;
+    this.element.querySelector('ul')!.id = listId;
+    this.element.querySelector('h2')!.textContent = this.type.toUpperCase() + 'PROJECTS';
+  }
+
+  private attach() {
+    this.hostElement.insertAdjacentElement('beforeend', this.element);
+  }
+}
+
+
 // ProjectInput Class
 class ProjectInput {
   templateElement: HTMLTemplateElement;
@@ -121,6 +154,7 @@ class ProjectInput {
     if (Array.isArray(userInput)) {
       const [title, desc, people] = userInput;
       console.log(title, desc, people);
+      // document.getElementById(); OOP 방식에서 이런 식(다른 클래스에 있는 것을 모아버려서)으로 달아버리면 새로운 클래스를 생성하게 되고 돔에는 우리가 부른 어떠한 값이 또 실행 되어 버린다.
       this.clearInputs();
     }
   }
@@ -137,4 +171,9 @@ class ProjectInput {
   }
 }
 
+// 리스트 프로젝트의 참조를 인풋 클래스에서 하고 인스턴스 생성 메소드를 부를 것이다.
+// 좀더 추상적인 접근이 필요한다. 그래서 우리 어플리케이션의 상태를 매니징 하는 클래스를 만들 것이고 이 클래스는 또한 다른 파트의 리스너 들을 셋업 할 수 있다.
+// 현대적인 프론트엔드 프레임워크에서도 글로벌 스테이트 매니저 오브젝트를 사용한다. 우리는 단지 변화를 듣는다. 
 const prjInput = new ProjectInput();
+const activePrjList = new ProjectList('active');
+const finishedPrjList = new ProjectList('finished');
