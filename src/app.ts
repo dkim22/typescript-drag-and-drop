@@ -18,15 +18,24 @@ class Project {
 }
 
 // Project State Management
-type Listener = (items: Project[]) => void;
+type Listener<T> = (items: T[]) => void;
 
-class ProjectState {
-  private listeners: Listener[] = [];
+class State<T> {
+  protected listeners: Listener<T>[] = [];
+  
+  addListener(listenerFn: Listener<T>) {
+    this.listeners.push(listenerFn);
+  }
+}
+
+// 여러가지 다른 상태 관리 (유저가 로그인을 했는지, 쇼핑 리스트라던지)
+// 큰 프로젝트를 위해서 상속을 구현한다.
+class ProjectState extends State<Project>{
   private projects: Project[] = [];
   private static instance: ProjectState;
 
   private constructor() {
-
+    super();
   }
 
   static getInstance() {
@@ -35,10 +44,6 @@ class ProjectState {
     }
     this.instance = new ProjectState();
     return this.instance;
-  }
-
-  addListener(listenerFn: Listener) {
-    this.listeners.push(listenerFn);
   }
 
   addProject(title: string, description: string, numOfPeople: number) {
@@ -206,7 +211,7 @@ class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
     this.element.addEventListener('submit', this.submitHandler.bind(this));
   }
 
-  renderContent() {}
+  renderContent() { }
 
   private gatherUserInput(): [string, string, number] | void{
     const enteredTitle = this.titleInputElement.value;
